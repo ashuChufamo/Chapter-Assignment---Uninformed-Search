@@ -86,18 +86,81 @@ def depthFirstSearch(problem: SearchProblem):
     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    stack = [(problem.getStartState(), [], set())]
+
+    while stack:
+        state, actions, visited = stack.pop()
+
+        print("Current state:", state)
+        print("Current actions:", actions)
+
+        if problem.isGoalState(state):
+            print("Goal state reached!")
+            return actions
+
+        if state not in visited:
+            visited.add(state)
+            successors = problem.getSuccessors(state)
+            for successor, action, _ in successors:
+                if successor not in visited:
+                    stack.append((successor, actions + [action], visited.copy()))
+
+    return []  
 
 def breadthFirstSearch(problem: SearchProblem):
     """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    queue = util.Queue()
+    visited = set()
+    
+    queue.push([(problem.getStartState(), 'Stop', 0)])
+    
+    while not queue.isEmpty():
+        path = queue.pop()
+        node = path[-1][0]
+        
+        if problem.isGoalState(node):
+            return [action for (_, action, _) in path][1:]
+        
+        if node not in visited:
+            visited.add(node)
+            successors = problem.getSuccessors(node)
+            
+            for successor in successors:
+                if successor[0] not in visited:
+                    new_path = path + [successor]
+                    queue.push(new_path)
+    
+    return None
 
 def uniformCostSearch(problem: SearchProblem):
     """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    queue = util.PriorityQueue()
+    visited = set()
+    cost = {}
+    
+    queue.push([(problem.getStartState(), 'Stop', 0)], 0)
+    cost[problem.getStartState()] = 0
+    
+    while not queue.isEmpty():
+        path = queue.pop()
+        node = path[-1][0]
+        
+        if problem.isGoalState(node):
+            return [action for (_, action, _) in path][1:]
+        
+        if node not in visited:
+            visited.add(node)
+            successors = problem.getSuccessors(node)
+            
+            for successor in successors:
+                new_cost = cost[node] + successor[2]
+                
+                if successor[0] not in cost or new_cost < cost[successor[0]]:
+                    cost[successor[0]] = new_cost
+                    new_path = path + [successor]
+                    queue.push(new_path, new_cost)
+    
+    return None
 
 def nullHeuristic(state, problem=None):
     """
@@ -108,8 +171,34 @@ def nullHeuristic(state, problem=None):
 
 def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    queue = util.PriorityQueue()
+    visited = set()
+    cost = {}
+    
+    queue.push([(problem.getStartState(), 'Stop', 0)], 0 + heuristic(problem.getStartState(), problem))
+    cost[problem.getStartState()] = 0
+    
+    while not queue.isEmpty():
+        path = queue.pop()
+        node = path[-1][0]
+        
+        if problem.isGoalState(node):
+            return [action for (_, action, _) in path][1:]
+        
+        if node not in visited:
+            visited.add(node)
+            successors = problem.getSuccessors(node)
+            
+            for successor in successors:
+                new_cost = cost[node] + successor[2]
+                
+                if successor[0] not in cost or new_cost < cost[successor[0]]:
+                    cost[successor[0]] = new_cost
+                    new_path = path + [successor]
+                    priority = new_cost + heuristic(successor[0], problem)
+                    queue.push(new_path, priority)
+    
+    return None
 
 
 # Abbreviations

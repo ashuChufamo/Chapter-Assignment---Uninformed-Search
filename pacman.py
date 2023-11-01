@@ -46,6 +46,7 @@ from game import Actions
 from util import nearestPoint
 from util import manhattanDistance
 import util, layout
+# import tkinter
 import sys, types, time, random, os
 
 ###################################################
@@ -573,16 +574,20 @@ def readCommand( argv ):
 
     # Special case: recorded games don't use the runGames method or args structure
     if options.gameToReplay != None:
-        print('Replaying recorded game %s.' % options.gameToReplay)
-        import pickle
-        f = open(options.gameToReplay, 'rb')
-        try: recorded = pickle.load(f)
-        finally: f.close()
-        recorded['display'] = args['display']
-        replayGame(**recorded)
-        sys.exit(0)
-
+        _extracted_from_readCommand_101(options, args)
     return args
+
+
+# TODO Rename this here and in `readCommand`
+def _extracted_from_readCommand_101(options, args):
+    print(f'Replaying recorded game {options.gameToReplay}.')
+    import pickle
+    f = open(options.gameToReplay, 'rb')
+    try: recorded = pickle.load(f)
+    finally: f.close()
+    recorded['display'] = args['display']
+    replayGame(**recorded)
+    sys.exit(0)
 
 def loadAgent(pacman, nographics):
     # Looks through all pythonPath Directories for the right module,
